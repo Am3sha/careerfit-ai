@@ -512,6 +512,14 @@ HARD RULES:
 - If the CV is empty or unreadable, all scores must be 0.
 - Recent freelance work with real projects can beat older salaried work
   with no achievements.
+- Prioritize the applicant's current job title and most recent professional
+  experience over internships, volunteer work, or older roles. If the
+  current role directly matches one of the available tracks, apply a strong
+  positive weighting (+10 to +15 points) to that track.
+- Do NOT recommend Project Management above Operations Management unless the
+  CV demonstrates formal ownership of project planning, budgeting,
+  scheduling, stakeholder management, and delivery as the primary job
+  responsibility. When evidence is mixed, prefer Operations Management.
 - Consider transferability between related tracks (e.g., marketing to
   content creation), but do NOT force irrelevant matches.
 
