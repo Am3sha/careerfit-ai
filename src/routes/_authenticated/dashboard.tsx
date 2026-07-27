@@ -902,22 +902,38 @@ function ApplicantDetailDialog({
 
   const analysis = applicant?.analysis;
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!applicant) return;
 
-    void fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-cv`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-      },
-      body: JSON.stringify({ applicant_id: applicant.id, force: true }),
-    }).catch((error) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-cv`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ applicant_id: applicant.id, force: true }),
+      });
+
+      if (!response.ok) {
+        let errorMessageFromServer = "Analysis failed";
+        try {
+          const body = await response.json();
+          if (typeof body?.error === "string" && body.error.trim().length > 0) {
+            errorMessageFromServer = body.error;
+          }
+        } catch {
+          // Use the fallback message when the error body is not valid JSON.
+        }
+        toast.error(errorMessageFromServer);
+        return;
+      }
+
+      toast.success("Analysis started — result will appear shortly");
+    } catch (error) {
       console.error("Failed to trigger analysis:", error);
       toast.error("Could not start analysis");
-    });
-
-    toast.success("Analysis started — result will appear shortly");
+    }
   };
 
   const textSections = [
