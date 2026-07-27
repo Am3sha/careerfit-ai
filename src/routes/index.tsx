@@ -29,7 +29,7 @@ import {
 
 const STAFF_EMAIL = "admin@icareer.local";
 
-import logoIcon from "../assets/icareeregy_logo.jpg";
+import logo from "../assets/icareeregy_logo.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import { TRACKS, EXPERIENCE_LEVELS } from "@/lib/tracks";
 import { Button } from "@/components/ui/button";
@@ -247,17 +247,17 @@ function ApplyPage() {
       <div className="pointer-events-none absolute inset-0 bg-grid opacity-60" />
       <div className="pointer-events-none absolute inset-0 bg-radial-fade" />
 
-      <div className="relative mx-auto max-w-6xl px-4 py-8 sm:px-6 md:py-12">
+      <div className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 md:px-8 py-6 md:py-10">
         {/* Header */}
-        <header className="mb-8 flex items-center justify-between border-b border-border/40 pb-5">
-          <div className="flex items-center gap-3.5">
-            <img src={logoIcon} alt="iCareer Logo" className="h-14 w-auto max-h-16 object-contain" />
-            <span className="font-display text-2xl font-bold tracking-tight text-ink">
+        <header className="mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="iCareer" className="h-14 w-auto" />
+            <span className="font-display text-xl font-bold tracking-tight text-ink">
               <span className="text-accent">i</span>Career
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="hidden items-center gap-1.5 rounded-full border border-border/70 bg-surface/50 px-3 py-1.5 text-xs text-muted-foreground md:flex backdrop-blur-sm">
+            <div className="hidden items-center gap-1.5 rounded-full border border-border/60 bg-surface/60 px-3 py-1.5 text-[11px] font-medium text-muted-foreground md:flex backdrop-blur-sm">
               <ShieldCheck className="h-3.5 w-3.5 text-accent" />
               Your data is encrypted and private
             </div>
@@ -268,7 +268,7 @@ function ApplyPage() {
                 setStaffPwd("");
                 setStaffOpen(true);
               }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-surface/50 px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:border-accent/30 hover:text-ink cursor-pointer hover:bg-surface duration-200"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-surface/60 px-3 py-1.5 text-[11px] font-medium text-muted-foreground transition hover:border-accent/30 hover:text-ink cursor-pointer hover:bg-surface duration-200"
             >
               <Lock className="h-3.5 w-3.5" />
               Staff
@@ -276,25 +276,26 @@ function ApplyPage() {
           </div>
         </header>
 
-        <div className="grid gap-8 lg:grid-cols-[1fr_1.3fr] lg:gap-12 items-start">
+        <div className="grid gap-6 md:gap-8 lg:grid-cols-[1fr_1.2fr] lg:gap-12 items-start">
           {/* Left: hero */}
-          <section className="lg:sticky lg:top-16 lg:pt-2">
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent/5 px-2.5 py-1 text-[11px] font-semibold text-accent backdrop-blur-sm">
-              <Sparkles className="h-3 w-3 animate-pulse" />
+          <section className="lg:sticky lg:top-16 pt-2 lg:pt-6">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent/5 px-3 py-1 text-[11px] font-semibold text-accent tracking-wide">
+              <Sparkles className="h-3 w-3" />
               AI-powered matching
             </div>
-            <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-ink md:text-4xl leading-tight lg:leading-[1.15]">
+            <h1 className="mt-5 font-display text-[2rem] leading-[1.12] font-bold tracking-tight text-ink md:text-[2.5rem] md:leading-[1.1] lg:text-[2.75rem] lg:leading-[1.08]">
               Skip the calls.
               <br />
-              <span className="text-accent">Get matched</span> to the right job.
+              <span className="text-accent">Get matched</span>{" "}
+              to the right job.
             </h1>
-            <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              Fill in your details once and upload your CV. Our AI reads your experience, scores
-              your profile, and routes you to the role that actually fits — no back-and-forth phone
-              interviews.
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground md:text-[15px] md:leading-relaxed">
+              Fill in your details once and upload your CV. Our AI reads your
+              experience, scores your profile, and routes you to the role that
+              actually fits — no back-and-forth phone interviews.
             </p>
 
-            <div className="mt-6 grid gap-3 grid-cols-1">
+            <div className="mt-8 grid gap-3">
               {[
                 {
                   icon: FileText,
@@ -314,13 +315,13 @@ function ApplyPage() {
               ].map((f) => (
                 <div
                   key={f.title}
-                  className="group flex gap-3.5 rounded-xl border border-border/40 bg-surface/40 p-3.5 transition-all duration-200 hover:border-accent/20 hover:bg-surface hover:shadow-card"
+                  className="group flex items-start gap-3.5 rounded-xl border border-border/50 bg-surface/50 p-3.5 transition-all duration-200 hover:border-accent/20 hover:bg-surface hover:shadow-sm"
                 >
-                  <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-lg bg-accent/[0.06] text-accent transition-all duration-200 group-hover:scale-105 group-hover:bg-accent/[0.1]">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent/[0.07] text-accent transition-all duration-200 group-hover:bg-accent/[0.12]">
                     <f.icon className="h-4 w-4" />
                   </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-ink group-hover:text-accent transition-colors duration-200">
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-semibold text-ink">
                       {f.title}
                     </h3>
                     <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
@@ -336,13 +337,13 @@ function ApplyPage() {
           <section>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="rounded-2xl border border-border/80 bg-surface/95 backdrop-blur-[2px] p-5 shadow-[0_4px_24px_rgb(0,0,0,0.04)] sm:p-7"
+              className="rounded-xl border border-border/70 bg-surface shadow-[0_1px_3px_oklch(0_0_0/0.04),0_10px_30px_-8px_oklch(0.25_0.08_155/0.12)] p-5 sm:p-6 md:p-7"
             >
-              <div className="mb-6 select-none">
-                <h2 className="font-display text-xl font-bold tracking-tight text-ink md:text-2xl">
-                  Application form
+              <div className="mb-7 select-none">
+                <h2 className="font-display text-lg font-bold tracking-tight text-ink md:text-xl">
+                  Submit Application
                 </h2>
-                <p className="mt-1 text-xs text-muted-foreground/95">
+                <p className="mt-1 text-xs text-muted-foreground/90">
                   Ready to match? Fill out your details. Required fields are marked with{" "}
                   <span className="text-accent font-semibold">*</span>
                 </p>
@@ -350,11 +351,10 @@ function ApplyPage() {
 
               {/* Personal */}
               <SectionTitle index="01" label="Personal info" />
-              <div className="mb-5 grid gap-3.5 sm:grid-cols-2">
+              <div className="mb-7 grid gap-4 sm:grid-cols-2">
                 <Field label="Full name *" error={form.formState.errors.full_name?.message}>
                   <Input
                     placeholder="Ahmed Mohamed"
-                    className="h-9 bg-surface/50 border-border/70 hover:border-accent/30 hover:bg-surface focus-visible:ring-[3px] focus-visible:ring-accent/10 focus-visible:border-accent transition-all duration-200 text-xs"
                     {...form.register("full_name")}
                   />
                 </Field>
@@ -362,14 +362,12 @@ function ApplyPage() {
                   <Input
                     type="email"
                     placeholder="you@example.com"
-                    className="h-9 bg-surface/50 border-border/70 hover:border-accent/30 hover:bg-surface focus-visible:ring-[3px] focus-visible:ring-accent/10 focus-visible:border-accent transition-all duration-200 text-xs"
                     {...form.register("email")}
                   />
                 </Field>
                 <Field label="Phone *" error={form.formState.errors.phone?.message}>
                   <Input
                     placeholder="+20 1XX XXX XXXX"
-                    className="h-9 bg-surface/50 border-border/70 hover:border-accent/30 hover:bg-surface focus-visible:ring-[3px] focus-visible:ring-accent/10 focus-visible:border-accent transition-all duration-200 text-xs"
                     {...form.register("phone")}
                   />
                 </Field>
@@ -379,7 +377,6 @@ function ApplyPage() {
                 >
                   <Input
                     placeholder="https://linkedin.com/in/..."
-                    className="h-9 bg-surface/50 border-border/70 hover:border-accent/30 hover:bg-surface focus-visible:ring-[3px] focus-visible:ring-accent/10 focus-visible:border-accent transition-all duration-200 text-xs"
                     {...form.register("linkedin_url")}
                   />
                 </Field>
@@ -387,13 +384,13 @@ function ApplyPage() {
 
               {/* Track */}
               <SectionTitle index="02" label="Preferred track" />
-              <div className="mb-5 grid gap-3.5 sm:grid-cols-2">
+              <div className="mb-7 grid gap-4 sm:grid-cols-2">
                 <Field label="Track *" error={form.formState.errors.track?.message}>
                   <Select
                     value={form.watch("track")}
                     onValueChange={(v) => form.setValue("track", v, { shouldValidate: true })}
                   >
-                    <SelectTrigger className="h-9 bg-surface/50 border-border/70 hover:border-accent/30 hover:bg-surface focus:ring-[3px] focus:ring-accent/10 focus:border-accent transition-all duration-200 text-xs">
+                    <SelectTrigger className="h-10">
                       <SelectValue placeholder="Choose a track" />
                     </SelectTrigger>
                     <SelectContent>
@@ -415,7 +412,7 @@ function ApplyPage() {
                       form.setValue("years_experience", v, { shouldValidate: true })
                     }
                   >
-                    <SelectTrigger className="h-9 bg-surface/50 border-border/70 hover:border-accent/30 hover:bg-surface focus:ring-[3px] focus:ring-accent/10 focus:border-accent transition-all duration-200 text-xs">
+                    <SelectTrigger className="h-10">
                       <SelectValue placeholder="Select experience" />
                     </SelectTrigger>
                     <SelectContent>
@@ -431,15 +428,15 @@ function ApplyPage() {
 
               {/* Behavioural */}
               <SectionTitle index="03" label="Tell us about you" />
-              <div className="mb-5 space-y-3.5">
+              <div className="mb-7 space-y-4">
                 <Field
                   label="Why did you choose this track? *"
                   error={form.formState.errors.why_this_track?.message}
                 >
                   <Textarea
-                    rows={2}
+                    rows={3}
+                    className="resize-none min-h-[88px]"
                     placeholder="What draws you to this field?"
-                    className="bg-surface/50 border-border/70 hover:border-accent/30 hover:bg-surface focus-visible:ring-[3px] focus-visible:ring-accent/10 focus-visible:border-accent transition-all duration-200 resize-none min-h-[58px] text-xs py-2"
                     {...form.register("why_this_track")}
                   />
                 </Field>
@@ -448,9 +445,9 @@ function ApplyPage() {
                   error={form.formState.errors.challenges?.message}
                 >
                   <Textarea
-                    rows={2}
+                    rows={3}
+                    className="resize-none min-h-[88px]"
                     placeholder="A real example helps us understand how you work."
-                    className="bg-surface/50 border-border/70 hover:border-accent/30 hover:bg-surface focus-visible:ring-[3px] focus-visible:ring-accent/10 focus-visible:border-accent transition-all duration-200 resize-none min-h-[58px] text-xs py-2"
                     {...form.register("challenges")}
                   />
                 </Field>
@@ -459,9 +456,9 @@ function ApplyPage() {
                   error={form.formState.errors.previous_experience?.message}
                 >
                   <Textarea
-                    rows={2}
+                    rows={3}
+                    className="resize-none min-h-[88px]"
                     placeholder="Companies, internships, freelance work, or notable projects."
-                    className="bg-surface/50 border-border/70 hover:border-accent/30 hover:bg-surface focus-visible:ring-[3px] focus-visible:ring-accent/10 focus-visible:border-accent transition-all duration-200 resize-none min-h-[58px] text-xs py-2"
                     {...form.register("previous_experience")}
                   />
                 </Field>
@@ -469,31 +466,32 @@ function ApplyPage() {
 
               {/* CV upload */}
               <SectionTitle index="04" label="Upload your CV" />
-              <div className="mb-5">
+              <div className="mb-7">
                 <CvDropzone file={cvFile} onFile={handleFile} error={cvError} />
               </div>
 
-              <div className="mt-6 space-y-2.5 border-t border-border/45 pt-4 text-center">
+              <div className="flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between border-t border-border/50 pt-5">
+                <p className="text-[11px] leading-normal text-muted-foreground/70 max-w-[200px]">
+                  By submitting, you agree to let our team securely review your application.
+                </p>
                 <Button
                   type="submit"
+                  size="lg"
                   disabled={submitting}
-                  className="w-full h-9.5 bg-accent text-accent-foreground hover:bg-accent/95 hover:shadow-sm focus-visible:ring-2 focus-visible:ring-accent active:scale-[0.98] transition-all font-medium text-xs"
+                  className="w-full sm:w-auto h-11 bg-accent text-accent-foreground hover:bg-accent/95 hover:shadow-md focus-visible:ring-2 focus-visible:ring-accent/50 active:scale-[0.98] transition-all font-medium"
                 >
                   {submitting ? (
                     <>
-                      <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Submitting…
                     </>
                   ) : (
                     <>
                       Submit Application
-                      <ArrowRight className="ml-2 h-3.5 w-3.5" />
+                      <ArrowRight className="ml-2 h-4 w-4" />
                     </>
                   )}
                 </Button>
-                <p className="text-[11px] leading-normal text-muted-foreground/80 mx-auto max-w-[280px]">
-                  By submitting, you agree to let our team securely review your application.
-                </p>
               </div>
             </form>
           </section>
@@ -552,14 +550,14 @@ function SectionTitle({
   className?: string;
 }) {
   return (
-    <div className={`mb-5 flex items-center gap-3 ${className}`}>
-      <span className="flex h-5 items-center justify-center rounded-full bg-accent/[0.08] px-2 font-display text-[10px] font-bold text-accent">
+    <div className={`mb-4 flex items-center gap-3 ${className}`}>
+      <span className="flex h-5 w-5 items-center justify-center rounded-md bg-accent/[0.09] font-display text-[10px] font-bold text-accent">
         {index}
       </span>
-      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/85">
+      <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground/80">
         {label}
       </span>
-      <div className="h-px flex-1 bg-border/60" />
+      <div className="h-px flex-1 bg-border/50" />
     </div>
   );
 }
@@ -575,11 +573,11 @@ function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs font-semibold text-ink">{label}</Label>
+      <Label className="text-xs font-semibold text-ink/90">{label}</Label>
       {children}
       {error && (
         <p className="text-[11px] font-medium text-destructive mt-1 flex items-center gap-1">
-          <AlertCircle className="h-3 w-3 inline" /> {error}
+          <AlertCircle className="h-3 w-3 inline shrink-0" /> {error}
         </p>
       )}
     </div>
@@ -611,12 +609,13 @@ function CvDropzone({
           const f = e.dataTransfer.files?.[0];
           if (f) onFile(f);
         }}
-        className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed bg-surface-elevated/40 px-6 py-8 text-center transition-all duration-200 ${dragging
-          ? "border-accent bg-accent/5 scale-[0.99]"
-          : file
-            ? "border-accent/40 bg-accent/[0.02]"
-            : "border-border/80 hover:border-accent/30 hover:bg-accent/[0.015]"
-          }`}
+        className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed bg-surface/50 px-5 py-7 text-center transition-all duration-200 ${
+          dragging
+            ? "border-accent bg-accent/5"
+            : file
+              ? "border-accent/35 bg-accent/[0.02]"
+              : "border-border/70 hover:border-accent/30 hover:bg-accent/[0.02]"
+        }`}
       >
         <input
           type="file"
@@ -626,23 +625,23 @@ function CvDropzone({
         />
         {file ? (
           <>
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/[0.08] text-accent">
-              <FileText className="h-5 w-5" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/[0.08] text-accent">
+              <FileText className="h-[18px] w-[18px]" />
             </div>
-            <p className="mt-3 text-sm font-semibold text-ink">{file.name}</p>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-3 text-xs font-semibold text-ink">{file.name}</p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
               {(file.size / 1024 / 1024).toFixed(2)} MB · Click to replace
             </p>
           </>
         ) : (
           <>
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/65 text-muted-foreground/80">
-              <Upload className="h-4.5 w-4.5" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted/60 text-muted-foreground/70">
+              <Upload className="h-[18px] w-[18px]" />
             </div>
-            <p className="mt-3 text-sm font-semibold text-ink">
+            <p className="mt-3 text-xs font-semibold text-ink">
               Drop your CV here or click to upload
             </p>
-            <p className="mt-1 text-xs text-muted-foreground/80">
+            <p className="mt-0.5 text-[11px] text-muted-foreground/70">
               PDF or Word · Up to {MAX_FILE_MB}MB
             </p>
           </>
@@ -650,7 +649,7 @@ function CvDropzone({
       </label>
       {error && (
         <p className="mt-2 text-[11px] font-medium text-destructive flex items-center gap-1">
-          <AlertCircle className="h-3 w-3 inline" /> {error}
+          <AlertCircle className="h-3 w-3 inline shrink-0" /> {error}
         </p>
       )}
     </div>
@@ -661,16 +660,16 @@ function SuccessScreen({ onReset, applicantId }: { onReset: () => void; applican
   const [showFeedback, setShowFeedback] = useState(false);
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-6">
-      <div className="pointer-events-none absolute inset-0 bg-grid opacity-60" />
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 sm:px-6">
+      <div className="pointer-events-none absolute inset-0 bg-grid opacity-50" />
       <div className="pointer-events-none absolute inset-0 bg-radial-fade" />
 
-      <div className="relative w-full max-w-lg rounded-2xl border border-border bg-surface p-10 text-center shadow-card">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent/10 text-accent">
-          <CheckCircle2 className="h-7 w-7" />
+      <div className="relative w-full max-w-md rounded-xl border border-border/70 bg-surface shadow-[0_1px_3px_oklch(0_0_0/0.04),0_10px_30px_-8px_oklch(0.25_0.08_155/0.12)] p-8 sm:p-10 text-center">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 text-accent">
+          <CheckCircle2 className="h-6 w-6" />
         </div>
-        <h1 className="mt-5 font-display text-2xl font-semibold text-ink">Application received</h1>
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+        <h1 className="mt-4 font-display text-xl font-semibold text-ink">Application received</h1>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
           Thanks for applying. Our AI is analyzing your CV and matching it to open roles. The
           Operations team will reach out if you're a strong fit — usually within a few days.
         </p>
@@ -680,10 +679,10 @@ function SuccessScreen({ onReset, applicantId }: { onReset: () => void; applican
 
         {applicantId && !showFeedback && (
           <>
-            <div className="my-6 h-px bg-border" />
+            <div className="my-5 h-px bg-border/60" />
             <p className="text-sm text-muted-foreground">Curious what our AI thought of your CV?</p>
             <Button
-              className="mt-3 bg-accent text-accent-foreground hover:bg-accent/90"
+              className="mt-3 bg-accent text-accent-foreground hover:bg-accent/90 shadow-sm"
               onClick={() => setShowFeedback(true)}
             >
               <Sparkles className="mr-2 h-4 w-4" />
@@ -700,7 +699,7 @@ function SuccessScreen({ onReset, applicantId }: { onReset: () => void; applican
 
 type AnalysisData = {
   status: string;
-  fit_score: number | null;
+  ats_score: number | null;
   strengths: string[];
   weaknesses: string[];
   missing_skills: string[];
@@ -754,7 +753,7 @@ function CvFeedbackView({ applicantId }: { applicantId: string }) {
           : [];
         const normalized: AnalysisData = {
           status: raw.status,
-          fit_score: typeof raw.fit_score === "number" ? raw.fit_score : (typeof raw.ats_score === "number" ? raw.ats_score : null),
+          ats_score: typeof raw.ats_score === "number" ? raw.ats_score : null,
           strengths: Array.isArray(raw.strengths) ? raw.strengths : [],
           weaknesses: Array.isArray(raw.weaknesses) ? raw.weaknesses : [],
           missing_skills: Array.isArray(raw.missing_skills) ? raw.missing_skills : [],
@@ -904,7 +903,7 @@ function CvFeedbackView({ applicantId }: { applicantId: string }) {
   }
 
   const isGoodFit = analysis.track_fit === true;
-  const applicantFitScore = analysis.selected_track_score ?? analysis.fit_score ?? 0;
+  const score = analysis.ats_score ?? 0;
 
   return (
     <div className="mt-8 rounded-xl border border-border bg-surface-elevated p-6 text-left">
@@ -912,7 +911,7 @@ function CvFeedbackView({ applicantId }: { applicantId: string }) {
         <div className="mb-6 flex items-center justify-between">
           <h2 className="font-display text-xl font-semibold text-ink">Great match! 🎯</h2>
           <div className="flex items-center rounded-full bg-accent/10 px-3 py-1 text-sm font-medium text-accent">
-            {applicantFitScore}/100
+            {score}/100
           </div>
         </div>
       ) : (

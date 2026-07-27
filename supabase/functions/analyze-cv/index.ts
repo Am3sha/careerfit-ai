@@ -6,10 +6,9 @@ import { extractText, getDocumentProxy } from "https://esm.sh/unpdf@0.11.0";
 const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY") ?? "";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-const ALLOWED_ORIGINS = [
-  "http://localhost:8080",
-  "http://192.168.245.1:8080",
-];
+const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") ??
+  "http://localhost:8080,http://127.0.0.1:8080"
+).split(",").map(s => s.trim()).filter(Boolean);
 const MODEL_CHAIN = [
   "nvidia/nemotron-nano-9b-v2:free",
   "inclusionai/ling-3.0-flash:free",
@@ -197,27 +196,42 @@ function normalizeAnalysis(raw: unknown, selectedTrack: string): AnalysisPayload
   const candidate = (raw ?? {}) as Partial<AnalysisPayload> & Record<string, unknown>;
   const recommended = normalizeRecommendedTracks(candidate.recommended_tracks);
 
+  // Enforce sort descending — latest AI wins, but we always trust the computed order
+  const sortedRecs = [...recommended].sort((a, b) => b.score - a.score);
+
   let bestTrack = "";
-  const rawBest = typeof candidate.best_track === "string" ? candidate.best_track.trim() : "";
-  if (rawBest && TRACKS_LIST.includes(rawBest as typeof TRACKS_LIST[number])) {
-    bestTrack = rawBest;
-  } else if (recommended.length > 0) {
-    bestTrack = recommended[0].track;
+  if (sortedRecs.length > 0) {
+    bestTrack = sortedRecs[0].track;
+    if (candidate.best_track && candidate.best_track !== bestTrack) {
+      console.warn("[normalize] AI best_track", candidate.best_track, "overridden to", bestTrack);
+    }
   } else {
-    bestTrack = selectedTrack;
+    const rawBest = typeof candidate.best_track === "string" ? candidate.best_track.trim() : "";
+    bestTrack = rawBest && TRACKS_LIST.includes(rawBest as typeof TRACKS_LIST[number])
+      ? rawBest
+      : selectedTrack;
   }
 
   let lowConfidence = false;
-  if (recommended.length === 0 && bestTrack) {
+  if (sortedRecs.length === 0 && bestTrack) {
     lowConfidence = true;
-    recommended.push({
+    sortedRecs.push({
       track: bestTrack,
       score: normalizeScore(candidate.selected_track_score ?? candidate.ats_score ?? 0),
       reason: "CV analysis complete — track scored from submitted application details.",
     });
   }
 
-  const selectedTrackInTop = recommended.some((r) => r.track === selectedTrack);
+  // fit_score MUST equal the top-ranked recommendation's score
+  const fitScore = sortedRecs.length > 0
+    ? sortedRecs[0].score
+    : normalizeScore(candidate.ats_score ?? 0);
+
+  if (candidate.ats_score !== undefined && candidate.ats_score !== fitScore) {
+    console.warn("[normalize] AI ats_score", candidate.ats_score, "overridden to fit_score", fitScore);
+  }
+
+  const selectedTrackInTop = sortedRecs.some((r) => r.track === selectedTrack);
   let aiAgrees = candidate.ai_agrees_with_selection === true;
   if (candidate.ai_agrees_with_selection !== true && candidate.ai_agrees_with_selection !== false) {
     aiAgrees = selectedTrackInTop;
@@ -235,18 +249,11 @@ function normalizeAnalysis(raw: unknown, selectedTrack: string): AnalysisPayload
   }
   if (
     bestTrack !== selectedTrack &&
-    recommended.length > 0 &&
-    recommended[0].score - selectedScore > 15
+    sortedRecs.length > 0 &&
+    sortedRecs[0].score - selectedScore > 15
   ) {
     trackFit = false;
   }
-
-  // fit_score: prefer AI's fit_score; fallback to best_track's score (recommended[0].score)
-  // Legacy AI may return ats_score; treat it as fit_score for backward compatibility.
-  // Note: ats_score column in DB stores fit_score value (legacy column name).
-  const fitScore = normalizeScore(
-    candidate.fit_score ?? candidate.ats_score ?? (recommended.length > 0 ? recommended[0].score : 0)
-  );
 
   return {
     strengths: normalizeArray(candidate.strengths),
@@ -258,7 +265,7 @@ function normalizeAnalysis(raw: unknown, selectedTrack: string): AnalysisPayload
     track_fit_reason: typeof candidate.track_fit_reason === "string" ? candidate.track_fit_reason.trim() : "",
     summary: typeof candidate.summary === "string" ? candidate.summary.trim() : "",
     selected_track_score: selectedScore,
-    recommended_tracks: recommended,
+    recommended_tracks: sortedRecs,
     best_track: bestTrack,
     ai_agrees_with_selection: aiAgrees,
     disagreement_reason: aiAgrees ? "" : disagreementReason,
@@ -384,34 +391,63 @@ async function callOpenRouter(systemPrompt: string, userMessage: string): Promis
     response_format: { type: "json_object" },
   };
 
+  const RETRYABLE_STATUS = new Set([429, 500, 502, 503]);
   let lastError: unknown;
 
   for (const model of MODEL_CHAIN) {
-    try {
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "https://localhost",
-          "X-Title": "iCareer CV Analysis",
-        },
-        body: JSON.stringify({ ...requestBody, model }),
-      });
+    for (let attempt = 0; attempt < 2; attempt++) {
+      let responseStatus: number | undefined;
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-      const payload = await response.json();
-      if (!response.ok) {
-        throw new Error(payload?.error?.message ?? `OpenRouter error ${response.status}`);
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://localhost",
+            "X-Title": "iCareer CV Analysis",
+          },
+          body: JSON.stringify({ ...requestBody, model }),
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        responseStatus = response.status;
+
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error(payload?.error?.message ?? `OpenRouter error ${response.status}`);
+        }
+
+        const content = payload?.choices?.[0]?.message?.content ?? "";
+        if (typeof content !== "string") {
+          throw new Error("OpenRouter returned an unexpected payload");
+        }
+        if (content.trim().length === 0) {
+          throw new Error("OpenRouter returned an empty response");
+        }
+
+        return { content, model };
+      } catch (error) {
+        const err = error as Error & { name?: string };
+        const isTimeout = err.name === "AbortError";
+        const isNetwork = err instanceof TypeError;
+        const isRetryableStatus = typeof responseStatus === "number" && RETRYABLE_STATUS.has(responseStatus);
+        const isAuthError = typeof responseStatus === "number" && (responseStatus === 401 || responseStatus === 403);
+        const isEmptyResponse = err.message === "OpenRouter returned an empty response";
+        const isPayloadShape = err.message === "OpenRouter returned an unexpected payload";
+        const retryable =
+          (isTimeout || isNetwork || isRetryableStatus) && !isAuthError && !isEmptyResponse && !isPayloadShape;
+
+        if (attempt === 0 && retryable) {
+          await new Promise((r) => setTimeout(r, 1500));
+          continue;
+        }
+
+        lastError = error;
+        break;
       }
-
-      const content = payload?.choices?.[0]?.message?.content ?? "";
-      if (typeof content !== "string") {
-        throw new Error("OpenRouter returned an unexpected payload");
-      }
-
-      return { content, model };
-    } catch (error) {
-      lastError = error;
     }
   }
 

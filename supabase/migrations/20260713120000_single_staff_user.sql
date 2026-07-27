@@ -1,6 +1,6 @@
 -- Bootstrap a single staff user for this personal tool.
 -- Email: admin@icareer.local
--- Password: AMR@12345 (change in Supabase dashboard afterwards if desired)
+-- Password: set via Supabase Auth Dashboard after first deploy — see README
 
 DO $$
 DECLARE
@@ -22,7 +22,7 @@ BEGIN
       v_user_id,
       'authenticated', 'authenticated',
       'admin@icareer.local',
-      crypt('AMR@12345', gen_salt('bf')),
+      crypt(coalesce(current_setting('app.staff_initial_password', true), 'CHANGE_ME_IN_DASHBOARD'), gen_salt('bf')),
       now(), now(), now(),
       '{"provider":"email","providers":["email"]}'::jsonb,
       '{}'::jsonb,
