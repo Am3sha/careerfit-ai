@@ -8,7 +8,7 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const ALLOWED_ORIGINS = (
   Deno.env.get("ALLOWED_ORIGINS") ??
-  "http://localhost:8080,https://careerfit-ai-liart.vercel.app"
+  "http://localhost:8080,https://icareer-ai.vercel.app"
 )
   .split(",")
   .map((s) => s.trim())
@@ -483,6 +483,24 @@ For each track, score it out of 100 using this weighted formula:
         business impact — not just responsibilities.
 
 HARD RULES:
+- === CV IS THE PRIMARY SOURCE OF TRUTH ===
+  The CV represents the applicant's actual work history — facts they
+  can be held accountable for. The form represents their INTENTIONS and CLAIMS.
+
+  Priority order for scoring:
+  1. Current/most recent job title in CV (highest signal for career direction)
+  2. Skills and technologies demonstrated in CV with concrete evidence
+  3. Recent projects and measurable achievements in CV
+  4. Educational background in CV
+  5. THEN the applicant's stated preferences from the form
+
+  If the applicant selected a track (from the form) that doesn't match
+  their CV, still score their selected track — but the best_track and top
+  recommended_tracks must come primarily from what the CV shows they're
+  ACTUALLY qualified for.
+
+  If the form is empty, corrupted, or shorter than 10 characters per field,
+  IGNORE the form entirely and rely 100% on CV evidence.
 - === EVIDENCE HIERARCHY (MOST IMPORTANT RULE) ===
   The CV is the AUTHORITATIVE source of truth. Form answers are
   supplementary claims that may or may not be backed by the CV.
@@ -696,18 +714,22 @@ serve(async (req) => {
     const safeCvText = sanitizeUserContent(
       truncateText(extractedText || "No CV text could be extracted."),
     );
+    const safeFullName = sanitizeUserContent(applicantFields.full_name?.trim() || "");
+    const safeTrack = sanitizeUserContent(applicantFields.track?.trim() || "");
+    const safeYears = sanitizeUserContent(applicantFields.years_experience?.trim() || "");
 
     const systemPrompt = buildSystemPrompt();
-    const userMessage = `Applicant name: ${applicantFields.full_name}
+    const userMessage = `Applicant name: ${safeFullName}
 
 <<<FORM_START>>>
-APPLICANT FORM SUBMISSION (their own words):
-- Selected track: ${applicantFields.track}
-- Years of experience claimed: ${applicantFields.years_experience}
-- Why they chose this track: "${safeWhy}"
-- Biggest challenges faced: "${safeChallenges}"
-- Previous experience: "${safePreviousExperience}"
-- LinkedIn: ${applicantFields.linkedin_url?.trim() || "not provided"}
+APPLICANT FORM SUBMISSION:
+- Preferred track: ${safeTrack}
+- Years of experience: ${safeYears}
+
+Tell us about themselves (their own words):
+"Why this track: ${safeWhy || 'not provided'}
+Challenges faced: ${safeChallenges || 'not provided'}
+Previous experience: ${safePreviousExperience || 'not provided'}"
 <<<FORM_END>>>
 
 <<<CV_START>>>
