@@ -887,40 +887,25 @@ function ApplicantDetailDialog({
   deletingApplicantId: string | null;
 }) {
   const [downloading, setDownloading] = useState(false);
-  const [analyzing, setAnalyzing] = useState(false);
-  const qc = useQueryClient();
 
   const analysis = applicant?.analysis;
 
-  const handleAnalyze = async () => {
+  const handleAnalyze = () => {
     if (!applicant) return;
-    setAnalyzing(true);
-    try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-cv`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({ applicant_id: applicant.id, force: true }),
-      });
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        toast.error(payload?.error ?? "Analysis failed");
-        return;
-      }
-      if (payload?.ok !== true || payload?.status !== "done") {
-        toast.error(payload?.error ?? "Analysis failed");
-        return;
-      }
-      await qc.invalidateQueries({ queryKey: ["cv-analyses-all"] });
-      toast.success("Analysis requested");
-    } catch (error) {
-      console.error(error);
+
+    void fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-cv`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify({ applicant_id: applicant.id, force: true }),
+    }).catch((error) => {
+      console.error("Failed to trigger analysis:", error);
       toast.error("Could not start analysis");
-    } finally {
-      setAnalyzing(false);
-    }
+    });
+
+    toast.success("Analysis started — result will appear shortly");
   };
 
   const textSections = [
@@ -1014,10 +999,7 @@ function ApplicantDetailDialog({
                 <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
                   <div className="mb-2 flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-ink">AI Analysis</h3>
-                    <Button size="sm" variant="outline" onClick={handleAnalyze} disabled={analyzing}>
-                      {analyzing ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : null}
+                    <Button size="sm" variant="outline" onClick={handleAnalyze}>
                       Re-analyze
                     </Button>
                   </div>
@@ -1085,10 +1067,7 @@ function ApplicantDetailDialog({
                       <p className="text-sm text-destructive">
                         {analysis.error_message ?? "The analysis failed."}
                       </p>
-                      <Button size="sm" variant="outline" onClick={handleAnalyze} disabled={analyzing}>
-                        {analyzing ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : null}
+                      <Button size="sm" variant="outline" onClick={handleAnalyze}>
                         Retry
                       </Button>
                     </div>
