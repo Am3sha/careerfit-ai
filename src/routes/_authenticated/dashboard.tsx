@@ -349,10 +349,22 @@ function DashboardPage() {
         toast.error("Nothing to export");
         return;
       }
-      const headers = ["#", "Candidate", "Track", "Experience", "Score", "AI Fit Score", "AI Suggests"];
+      const headers = [
+        "#",
+        "Candidate",
+        "Email",
+        "Phone",
+        "Track",
+        "Experience",
+        "Score",
+        "AI Fit Score",
+        "AI Suggested Track",
+      ];
       const rows = ranked.map((a, idx) => [
         idx + 1,
         a.full_name ?? "",
+        a.email ?? "",
+        a.phone ?? "",
         a.track ?? "",
         a.years_experience ?? "",
         a.scoreParts.total,
