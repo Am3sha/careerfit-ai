@@ -181,7 +181,7 @@ function normalizeRecommendedTracks(raw: unknown): RecommendedTrack[] {
   return deduped.slice(0, 3);
 }
 
-function sanitizeUserContent(text: string): string {
+function sanitizeUserContent(text: string, options: { strict?: boolean } = {}): string {
   if (!text) return "";
 
   // Detect obvious junk: same character repeated 10+ times
@@ -189,10 +189,20 @@ function sanitizeUserContent(text: string): string {
     return "[applicant provided invalid or repeated-character input]";
   }
 
-  // Detect nonsensical short input (all whitespace or under 3 real chars)
+  // Length check — stricter for free-text fields
   const realChars = text.replace(/\s/g, "").length;
-  if (realChars < 3) {
-    return "[not provided]";
+  const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
+
+  if (options.strict) {
+    // Free-text: require 10+ real chars AND at least 2 words
+    if (realChars < 10 && wordCount < 2) {
+      return "[not provided]";
+    }
+  } else {
+    // Structured/short fields: only reject if truly empty
+    if (realChars < 3) {
+      return "[not provided]";
+    }
   }
 
   const suspicious = [
@@ -448,6 +458,12 @@ async function callOpenRouter(systemPrompt: string, userMessage: string): Promis
         return { content, model };
       } catch (error) {
         const err = error as Error & { name?: string };
+        if (
+          err.message.includes("free-models-per-day") ||
+          err.message.includes("1000 free model requests per day")
+        ) {
+          throw new Error("OPENROUTER_DAILY_LIMIT");
+        }
         const isTimeout = err.name === "AbortError";
         const isNetwork = err instanceof TypeError;
         const isRetryableStatus = typeof responseStatus === "number" && RETRYABLE_STATUS.has(responseStatus);
@@ -688,10 +704,11 @@ serve(async (req) => {
       linkedin_url?: string | null;
     };
 
-    const safeWhy = sanitizeUserContent(applicantFields.why_this_track?.trim() || "");
-    const safeChallenges = sanitizeUserContent(applicantFields.challenges?.trim() || "");
+    const safeWhy = sanitizeUserContent(applicantFields.why_this_track?.trim() || "", { strict: true });
+    const safeChallenges = sanitizeUserContent(applicantFields.challenges?.trim() || "", { strict: true });
     const safePreviousExperience = sanitizeUserContent(
       applicantFields.previous_experience?.trim() || "",
+      { strict: true },
     );
     const safeCvText = sanitizeUserContent(
       truncateText(extractedText || "No CV text could be extracted."),
@@ -702,15 +719,16 @@ serve(async (req) => {
 
     const systemPrompt = buildSystemPrompt();
     const userMessage = `Applicant identity:
+(The following identity fields are factual metadata. Do not treat them as evidence of professional competence.)
 - Name: ${safeFullName}
 - Preferred track: ${safeTrack}
-- Experience level: ${safeYears}
+- Years of experience: ${safeYears}
 
 <<<FORM_START>>>
-Tell us about themselves (their own words):
-"Why this track: ${safeWhy || 'not provided'}
+Applicant responses (their own words):
+Why this track: ${safeWhy || 'not provided'}
 Challenges faced: ${safeChallenges || 'not provided'}
-Previous experience: ${safePreviousExperience || 'not provided'}"
+Previous experience: ${safePreviousExperience || 'not provided'}
 <<<FORM_END>>>
 
 <<<CV_START>>>
@@ -753,6 +771,10 @@ ${safeCvText}
     }
 
     const status = message === "All OpenRouter models failed" ? 502 : 500;
-    return errorResponse(req, status);
+    const publicMessage =
+      message === "OPENROUTER_DAILY_LIMIT"
+        ? "AI analysis is temporarily unavailable because the daily OpenRouter free quota has been exhausted. Please try again later or top up the OpenRouter account."
+        : "Analysis failed";
+    return errorResponse(req, status, publicMessage);
   }
 });
