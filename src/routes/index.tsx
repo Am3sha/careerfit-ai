@@ -958,7 +958,7 @@ function CvFeedbackView({ applicantId }: { applicantId: string }) {
         <div className="mt-6">
           <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
             <TrendingUp className="h-4 w-4 text-accent" />
-            Skills to build
+            Suggested skills for growth
           </h3>
           <div className="flex flex-wrap gap-2">
             {analysis.missing_skills.map((skill, i) => (

@@ -1049,7 +1049,7 @@ function ApplicantDetailDialog({
                         </div>
                       </div>
                       <div>
-                        <h4 className="mb-2 text-sm font-semibold text-ink">Missing skills</h4>
+                        <h4 className="mb-2 text-sm font-semibold text-ink">Suggested skills for growth</h4>
                         <div className="flex flex-wrap gap-2">
                           {analysis.missing_skills.map((item) => (
                             <Badge key={item} variant="secondary">
