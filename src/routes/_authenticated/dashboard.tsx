@@ -1091,12 +1091,17 @@ function ApplicantDetailDialog({
                       Analysis is being prepared…
                     </div>
                   ) : analysis?.status === "failed" ? (
-                    <div className="space-y-2">
-                      <p className="text-sm text-destructive">
-                        {analysis.error_message ?? "The analysis failed."}
-                      </p>
+                    <div className="space-y-3">
+                      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3">
+                        <p className="text-sm font-medium text-destructive">
+                          Analysis could not be completed
+                        </p>
+                        <p className="mt-1 text-xs text-destructive/80">
+                          {analysis.error_message ?? "The analysis failed unexpectedly."}
+                        </p>
+                      </div>
                       <Button size="sm" variant="outline" onClick={handleAnalyze}>
-                        Retry
+                        Retry analysis
                       </Button>
                     </div>
                   ) : (

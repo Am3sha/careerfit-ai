@@ -773,7 +773,7 @@ ${safeCvText}
     const status = message === "All OpenRouter models failed" ? 502 : 500;
     const publicMessage =
       message === "OPENROUTER_DAILY_LIMIT"
-        ? "AI analysis is temporarily unavailable because the daily OpenRouter free quota has been exhausted. Please try again later or top up the OpenRouter account."
+        ? "AI analysis is temporarily unavailable because the daily OpenRouter free quota has been exhausted."
         : "Analysis failed";
     return errorResponse(req, status, publicMessage);
   }

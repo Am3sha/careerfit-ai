@@ -892,12 +892,18 @@ function CvFeedbackView({ applicantId }: { applicantId: string }) {
 
   if (status === "failed" || !analysis) {
     return (
-      <div className="mt-8 rounded-xl border border-border bg-surface-elevated p-6 text-center">
-        <AlertCircle className="mx-auto h-6 w-6 text-amber-500" />
-        <p className="mt-3 text-sm text-muted-foreground">
-          We couldn't analyze your CV automatically. Our team will still review your application
-          manually.
-        </p>
+      <div className="mt-8 space-y-3 rounded-xl border border-amber-200 bg-amber-50/60 p-5">
+        <div className="flex items-start gap-2">
+          <AlertCircle className="mt-0.5 h-4 w-4 text-amber-600" />
+          <div>
+            <p className="text-sm font-medium text-amber-900">
+              We couldn't complete the AI review right now
+            </p>
+            <p className="mt-1 text-xs text-amber-700">
+              {analysis?.error_message ?? "Our team will still review your application manually."}
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
