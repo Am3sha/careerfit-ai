@@ -6,9 +6,13 @@ import { extractText, getDocumentProxy } from "https://esm.sh/unpdf@0.11.0";
 const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY") ?? "";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") ??
-  "http://localhost:8080,http://127.0.0.1:8080"
-).split(",").map(s => s.trim()).filter(Boolean);
+const ALLOWED_ORIGINS = (
+  Deno.env.get("ALLOWED_ORIGINS") ??
+  "http://localhost:8080,https://careerfit-ai-liart.vercel.app"
+)
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
 const MODEL_CHAIN = [
   "nvidia/nemotron-nano-9b-v2:free",
   "inclusionai/ling-3.0-flash:free",
